@@ -1,5 +1,5 @@
 import { test, expect } from 'playwright-test-coverage';
-import {getInitials, mockLogin, validUsers} from "./util.js";
+import {getInitials, mockFranchises, mockLogin, validUsers} from "./util.js";
 
 async function basicInit(page) {
   await mockLogin(page)
@@ -26,26 +26,7 @@ async function basicInit(page) {
     await route.fulfill({ json: menuRes });
   });
 
-  // Standard franchises and stores
-  await page.route(/\/api\/franchise(\?.*)?$/, async (route) => {
-    const franchiseRes = {
-      franchises: [
-        {
-          id: 2,
-          name: 'LotaPizza',
-          stores: [
-            { id: 4, name: 'Lehi' },
-            { id: 5, name: 'Springville' },
-            { id: 6, name: 'American Fork' },
-          ],
-        },
-        { id: 3, name: 'PizzaCorp', stores: [{ id: 7, name: 'Spanish Fork' }] },
-        { id: 4, name: 'topSpot', stores: [] },
-      ],
-    };
-    expect(route.request().method()).toBe('GET');
-    await route.fulfill({ json: franchiseRes });
-  });
+  await mockFranchises(page)
 
   // Order a pizza.
   await page.route('*/**/api/order', async (route) => {

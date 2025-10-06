@@ -2,7 +2,8 @@ import {expect} from "playwright-test-coverage";
 import {Role} from "../src/service/pizzaService.js";
 
 export const validUsers = {
-  'd@jwt.com': { id: '3', name: 'Kai Chen', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] }
+  'd@jwt.com': { id: '3', name: 'Kai Chen', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] },
+  'a@jwt.com': { id: '3', name: 'Kai Chen', email: 'a@jwt.com', password: 'a', roles: [{ role: Role.Admin }] }
 };
 
 export function getInitials(name) {
@@ -69,5 +70,60 @@ export async function mockLogout(page) {
     };
     expect(route.request().method()).toBe('DELETE');
     await route.fulfill({ json: logoutRes });
+  });
+}
+
+export async function mockFranchises(page) {
+  // Standard franchises and stores
+  await page.route(/\/api\/franchise(\?.*)+$/, async (route) => {
+    const franchiseRes = {
+      franchises: [
+        {
+          id: 2,
+          name: 'LotaPizza',
+          stores: [
+            { id: 4, name: 'Lehi' },
+            { id: 5, name: 'Springville' },
+            { id: 6, name: 'American Fork' },
+          ],
+        },
+        { id: 3, name: 'PizzaCorp', stores: [{ id: 7, name: 'Spanish Fork' }] },
+        { id: 4, name: 'topSpot', stores: [] },
+      ],
+      more: true
+    };
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: franchiseRes });
+  });
+}
+
+export async function mockDeleteFranchise(page) {
+  await page.route(/\/api\/franchise\/\d+$/, async (route) => {
+    const deleteFranchiseRes = {
+      message: 'franchise deleted'
+    };
+    expect(route.request().method()).toBe('DELETE');
+    await route.fulfill({ json: deleteFranchiseRes });
+  });
+}
+
+export async function mockAddFranchise(page) {
+  await page.route('*/**/api/franchise', async (route) => {
+    const franchise = route.request().postDataJSON();
+    const admin = validUsers['a@jwt.com']
+    const addFranchiseRes = {
+      stores: [],
+      id: 5,
+      name: franchise.name,
+      admins: [
+        {
+          name: admin.name,
+          id: admin.id,
+          email: admin.email
+        }
+      ]
+    }
+    expect(route.request().method()).toBe('POST');
+    await route.fulfill({ json: addFranchiseRes });
   });
 }
