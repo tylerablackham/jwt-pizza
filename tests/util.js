@@ -60,3 +60,14 @@ export async function mockRegister(page) {
     await route.fulfill({ json: registeredUser });
   });
 }
+
+export async function mockLogout(page) {
+  // Authorize logout for the given user
+  await page.route('*/**/api/auth', async (route) => {
+    const logoutRes = {
+      message: 'logout successful'
+    };
+    expect(route.request().method()).toBe('DELETE');
+    await route.fulfill({ json: logoutRes });
+  });
+}

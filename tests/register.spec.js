@@ -1,15 +1,11 @@
 import { test, expect } from 'playwright-test-coverage';
-import {getInitials, mockRegister, validUsers} from "./util.js";
+import {getInitials, mockLogout, mockRegister, validUsers} from "./util.js";
 
-async function basicInit(page) {
-  await mockRegister(page)
-
-  await page.goto('/');
-}
-
-test('register', async({page}) => {
+test('register and logout', async({page}) => {
   const user = validUsers["d@jwt.com"]
-  await basicInit(page)
+  await mockRegister(page)
+  await page.goto('/');
+
   await page.getByRole('link', { name: 'Register' }).click();
   await expect(page.locator('form')).toContainText('Already have an account? Login instead.');
   await page.getByRole('textbox', { name: 'Full name' }).fill(user.name);
@@ -17,4 +13,8 @@ test('register', async({page}) => {
   await page.getByRole('textbox', { name: 'Password' }).fill(user.password);
   await page.getByRole('button', { name: 'Register' }).click();
   await expect(page.getByRole('link', { name: getInitials(user.name) })).toBeVisible();
+
+  await mockLogout(page)
+  await page.getByRole('link', { name: 'Logout' }).click();
+  await expect(page.locator('#navbar-dark')).toContainText('Register');
 })
