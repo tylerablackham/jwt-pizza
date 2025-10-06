@@ -1,32 +1,8 @@
 import { test, expect } from 'playwright-test-coverage';
-import {Role} from "../src/service/pizzaService.js";
+import {getInitials, mockLogin, validUsers} from "./util.js";
 
 async function basicInit(page) {
-  let loggedInUser
-  const validUsers = { 'd@jwt.com': { id: '3', name: 'Kai Chen', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] } };
-
-  // Authorize login for the given user
-  await page.route('*/**/api/auth', async (route) => {
-    const loginReq = route.request().postDataJSON();
-    const user = validUsers[loginReq.email];
-    if (!user || user.password !== loginReq.password) {
-      await route.fulfill({ status: 401, json: { error: 'Unauthorized' } });
-      return;
-    }
-    loggedInUser = validUsers[loginReq.email];
-    const loginRes = {
-      user: loggedInUser,
-      token: 'abcdef',
-    };
-    expect(route.request().method()).toBe('PUT');
-    await route.fulfill({ json: loginRes });
-  });
-
-  // Return the currently logged in user
-  await page.route('*/**/api/user/me', async (route) => {
-    expect(route.request().method()).toBe('GET');
-    await route.fulfill({ json: loggedInUser });
-  });
+  await mockLogin(page)
 
   // A standard menu
   await page.route('*/**/api/order/menu', async (route) => {
@@ -86,16 +62,18 @@ async function basicInit(page) {
 }
 
 test('login', async ({ page }) => {
+  const user = validUsers["d@jwt.com"]
   await basicInit(page);
   await page.getByRole('link', { name: 'Login' }).click();
-  await page.getByRole('textbox', { name: 'Email address' }).fill('d@jwt.com');
-  await page.getByRole('textbox', { name: 'Password' }).fill('a');
+  await page.getByRole('textbox', { name: 'Email address' }).fill(user.email);
+  await page.getByRole('textbox', { name: 'Password' }).fill(user.password);
   await page.getByRole('button', { name: 'Login' }).click();
 
-  await expect(page.getByRole('link', { name: 'KC' })).toBeVisible();
+  await expect(page.getByRole('link', { name: getInitials(user.name) })).toBeVisible();
 });
 
 test('purchase with login', async ({ page }) => {
+  const user = validUsers["d@jwt.com"]
   await basicInit(page);
 
   // Go to order page
@@ -111,9 +89,8 @@ test('purchase with login', async ({ page }) => {
 
   // Login
   await page.getByPlaceholder('Email address').click();
-  await page.getByPlaceholder('Email address').fill('d@jwt.com');
-  await page.getByPlaceholder('Email address').press('Tab');
-  await page.getByPlaceholder('Password').fill('a');
+  await page.getByPlaceholder('Email address').fill(user.email);
+  await page.getByPlaceholder('Password').fill(user.password);
   await page.getByRole('button', { name: 'Login' }).click();
 
   // Pay
