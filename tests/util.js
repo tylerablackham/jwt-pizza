@@ -3,8 +3,23 @@ import {Role} from "../src/service/pizzaService.js";
 
 export const validUsers = {
   'd@jwt.com': { id: '3', name: 'Kai Chen', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] },
+  'f@jwt.com': { id: '3', name: 'Kai Chen', email: 'f@jwt.com', password: 'a', roles: [{ role: Role.Franchisee }] },
   'a@jwt.com': { id: '3', name: 'Kai Chen', email: 'a@jwt.com', password: 'a', roles: [{ role: Role.Admin }] }
 };
+
+export const validFranchises = {
+  'LotaPizza': { id: 2, name: 'LotaPizza', stores: [
+      { id: 4, name: 'Lehi' },
+      { id: 5, name: 'Springville' },
+      { id: 6, name: 'American Fork' },
+    ],
+  },
+  'PizzaCorp': { id: 3, name: 'PizzaCorp', stores: [
+      { id: 7, name: 'Spanish Fork' }
+    ]
+  },
+  'topSpot': { id: 4, name: 'topSpot', stores: [] }
+}
 
 export function getInitials(name) {
   return name.split(' ').filter(Boolean).map(word => word[0]).join('');
@@ -78,17 +93,9 @@ export async function mockFranchises(page) {
   await page.route(/\/api\/franchise(\?.*)+$/, async (route) => {
     const franchiseRes = {
       franchises: [
-        {
-          id: 2,
-          name: 'LotaPizza',
-          stores: [
-            { id: 4, name: 'Lehi' },
-            { id: 5, name: 'Springville' },
-            { id: 6, name: 'American Fork' },
-          ],
-        },
-        { id: 3, name: 'PizzaCorp', stores: [{ id: 7, name: 'Spanish Fork' }] },
-        { id: 4, name: 'topSpot', stores: [] },
+        validFranchises['LotaPizza'],
+        validFranchises['PizzaCorp'],
+        validFranchises['topSpot']
       ],
       more: true
     };
@@ -125,5 +132,37 @@ export async function mockAddFranchise(page) {
     }
     expect(route.request().method()).toBe('POST');
     await route.fulfill({ json: addFranchiseRes });
+  });
+}
+
+export async function mockGetFranchise(page) {
+  await page.route(/\/api\/franchise\/\d+$/, async (route) => {
+    const getFranchiseRes = [
+      validFranchises['LotaPizza']
+    ]
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: getFranchiseRes });
+  });
+}
+
+export async function mockAddStore(page){
+  await page.route(/\/api\/franchise\/\d+\/store$/, async (route) => {
+    const addStoreRes = {
+      id: 2,
+      franchiseId: 1,
+      name: "new"
+    }
+    expect(route.request().method()).toBe('POST');
+    await route.fulfill({ json: addStoreRes });
+  });
+}
+
+export async function mockDeleteStore(page){
+  await page.route(/\/api\/franchise\/\d+\/store\/\d+$/, async (route) => {
+    const deleteStoreRes = {
+      message: 'store deleted'
+    }
+    expect(route.request().method()).toBe('DELETE');
+    await route.fulfill({ json: deleteStoreRes });
   });
 }
