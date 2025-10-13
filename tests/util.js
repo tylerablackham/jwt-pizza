@@ -7,6 +7,10 @@ export const validUsers = {
   'a@jwt.com': { id: '3', name: 'Kai Chen', email: 'a@jwt.com', password: 'a', roles: [{ role: Role.Admin }] }
 };
 
+export const updatedUsers = {
+  'd@jwt.com': { id: '3', name: 'Chai Ken', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] }
+}
+
 export const validFranchises = {
   'LotaPizza': { id: 2, name: 'LotaPizza', stores: [
       { id: 4, name: 'Lehi' },
@@ -165,4 +169,16 @@ export async function mockDeleteStore(page){
     expect(route.request().method()).toBe('DELETE');
     await route.fulfill({ json: deleteStoreRes });
   });
+}
+
+export async function mockUpdateUser(page) {
+  await page.route(/\/api\/user\/\d+/, async (route) => {
+    validUsers['d@jwt.com'] = updatedUsers['d@jwt.com']
+    const updateUserRes = {
+      user: validUsers['d@jwt.com'],
+      token: 'abcdef'
+    }
+    expect(route.request().method()).toBe('PUT');
+    await route.fulfill({ json: updateUserRes });
+  })
 }
