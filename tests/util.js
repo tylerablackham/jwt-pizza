@@ -184,3 +184,18 @@ export async function mockUpdateUser(page) {
     await route.fulfill({ json: updateUserRes });
   })
 }
+
+export async function mockGetUsers(page) {
+  await page.route(/\/api\/user(\?.*)+$/, async (route) => {
+    const usersRes = {
+      users: [
+        validUsers['f@jwt.com'],
+        validUsers['a@jwt.com'],
+        validUsers['d@jwt.com'],
+      ],
+      more: true
+    };
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: usersRes });
+  })
+}

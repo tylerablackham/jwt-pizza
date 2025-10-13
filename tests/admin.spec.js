@@ -17,13 +17,14 @@ test('admin dashboard', async({page}) => {
   await page.getByRole('link', { name: 'Admin' }).click();
   await expect(page.getByRole('list')).toContainText('admin-dashboard');
 
-  await page.getByRole('button', { name: '»' }).click(); 
-  await expect(page.getByRole('table')).toContainText('LotaPizza');
-  await expect(page.getByRole('table')).toContainText('PizzaCorp');
-  await expect(page.getByRole('table')).toContainText('topSpot'); 
+
+  await page.getByRole('button', { name: '»' }).nth(1).click();
+  await expect(page.getByRole('main')).toContainText('LotaPizza');
+  await expect(page.getByRole('main')).toContainText('PizzaCorp');
+  await expect(page.getByRole('main')).toContainText('topSpot'); 
   await page.getByRole('textbox', { name: 'Filter franchises' }).fill('LotaPizza');
-  await page.getByRole('button', { name: 'Submit' }).click();
-  await expect(page.getByRole('table')).toContainText('LotaPizza');
+  await page.getByRole('cell', { name: 'LotaPizza Submit' }).getByRole('button').click();
+  await expect(page.getByRole('main')).toContainText('LotaPizza');
   await expect(page.getByRole('button', { name: 'Add Franchise' })).toBeVisible();
 
   await page.getByRole('row', { name: 'LotaPizza Close' }).getByRole('button').click();

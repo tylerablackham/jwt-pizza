@@ -1,7 +1,16 @@
 import { test, expect } from 'playwright-test-coverage';
-import {getInitials, mockLogin, mockLogout, mockRegister, mockUpdateUser, updatedUsers, validUsers} from "./util.js";
+import {
+  getInitials,
+  mockFranchises, mockGetUsers,
+  mockLogin,
+  mockLogout,
+  mockRegister,
+  mockUpdateUser,
+  updatedUsers,
+  validUsers
+} from "./util.js";
 
-test('updateUser', async ({ page }) => {
+test('update user', async ({ page }) => {
   const user = validUsers["d@jwt.com"]
   const updatedUser = updatedUsers["d@jwt.com"]
   await mockRegister(page)
@@ -41,3 +50,26 @@ test('updateUser', async ({ page }) => {
   delete validUsers[updatedUser.email]
   validUsers[user.email] = user
 });
+
+test('list users', async({page}) => {
+  const user = validUsers["a@jwt.com"]
+  await mockLogin(page)
+  await mockGetUsers(page)
+  await page.goto('/');
+
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill(user.email);
+  await page.getByRole('textbox', { name: 'Password' }).fill(user.password);
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  await page.getByRole('link', { name: 'Admin' }).click();
+  await expect(page.getByRole('list')).toContainText('admin-dashboard');
+
+  await page.getByRole('button', { name: '»' }).first().click();
+  await expect(page.getByRole('main')).toContainText(user.name);
+  await expect(page.getByRole('main')).toContainText(validUsers['d@jwt.com'].name);
+  await expect(page.getByRole('main')).toContainText(validUsers['f@jwt.com'].name);
+  await page.getByRole('textbox', { name: 'Search Users' }).fill(user.name);
+  await page.getByRole('cell', { name: `${user.name} Submit` }).getByRole('button').click();
+  await expect(page.getByRole('main')).toContainText(user.name);
+})
