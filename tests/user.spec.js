@@ -37,4 +37,7 @@ test('updateUser', async ({ page }) => {
   await page.getByRole('button', { name: 'Login' }).click();
   await page.getByRole('link', { name: getInitials(updatedUser.name) }).click();
   await expect(page.getByRole('main')).toContainText(updatedUser.name);
+
+  delete validUsers[updatedUser.email]
+  validUsers[user.email] = user
 });
