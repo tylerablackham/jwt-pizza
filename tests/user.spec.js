@@ -19,6 +19,8 @@ test('updateUser', async ({ page }) => {
   await page.getByRole('button', { name: 'Edit' }).click();
   await expect(page.locator('h3')).toContainText('Edit user');
   await page.getByRole('textbox').first().fill(updatedUser.name);
+  await page.locator('input[type="email"]').fill(updatedUser.email);
+  await page.locator('#password').fill(updatedUser.password);
   await page.getByRole('button', { name: 'Update' }).click();
   await page.waitForSelector('[role="dialog"].hidden', { state: 'attached' });
   await expect(page.getByRole('main')).toContainText(updatedUser.name);
@@ -30,8 +32,8 @@ test('updateUser', async ({ page }) => {
   await mockLogin(page)
 
   await page.getByRole('link', { name: 'Login' }).click();
-  await page.getByRole('textbox', { name: 'Email address' }).fill(user.email);
-  await page.getByRole('textbox', { name: 'Password' }).fill(user.password);
+  await page.getByRole('textbox', { name: 'Email address' }).fill(updatedUser.email);
+  await page.getByRole('textbox', { name: 'Password' }).fill(updatedUser.password);
   await page.getByRole('button', { name: 'Login' }).click();
   await page.getByRole('link', { name: getInitials(updatedUser.name) }).click();
   await expect(page.getByRole('main')).toContainText(updatedUser.name);

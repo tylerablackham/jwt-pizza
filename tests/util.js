@@ -8,7 +8,7 @@ export const validUsers = {
 };
 
 export const updatedUsers = {
-  'd@jwt.com': { id: '3', name: 'Chai Ken', email: 'd@jwt.com', password: 'a', roles: [{ role: Role.Diner }] }
+  'd@jwt.com': { id: '3', name: 'Chai Ken', email: 'd2@jwt.com', password: 'aa', roles: [{ role: Role.Diner }] }
 }
 
 export const validFranchises = {
@@ -173,9 +173,11 @@ export async function mockDeleteStore(page){
 
 export async function mockUpdateUser(page) {
   await page.route(/\/api\/user\/\d+/, async (route) => {
-    validUsers['d@jwt.com'] = updatedUsers['d@jwt.com']
+    const updatedUser = updatedUsers['d@jwt.com']
+    delete validUsers['d@jwt.com']
+    validUsers[updatedUser.email] = updatedUser
     const updateUserRes = {
-      user: validUsers['d@jwt.com'],
+      user: updatedUser,
       token: 'abcdef'
     }
     expect(route.request().method()).toBe('PUT');
