@@ -1,5 +1,5 @@
 import { test, expect } from 'playwright-test-coverage';
-import {mockAddFranchise, mockDeleteFranchise, mockFranchises, mockLogin, validUsers} from "./util.js";
+import {mockAddFranchise, mockDeleteFranchise, mockFranchises, mockGetUsers, mockLogin, validUsers} from "./util.js";
 
 test('admin dashboard', async({page}) => {
   const user = validUsers["a@jwt.com"]
@@ -7,6 +7,7 @@ test('admin dashboard', async({page}) => {
   await mockFranchises(page)
   await mockDeleteFranchise(page)
   await mockAddFranchise(page)
+  await mockGetUsers(page)
   await page.goto('/');
 
   await page.getByRole('link', { name: 'Login' }).click();

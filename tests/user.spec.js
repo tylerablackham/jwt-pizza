@@ -51,10 +51,11 @@ test('update user', async ({ page }) => {
   validUsers[user.email] = user
 });
 
-test('list users', async({page}) => {
+test('list users and delete user', async({page}) => {
   const user = validUsers["a@jwt.com"]
   await mockLogin(page)
   await mockGetUsers(page)
+  await mockFranchises(page)
   await page.goto('/');
 
   await page.getByRole('link', { name: 'Login' }).click();
@@ -65,7 +66,7 @@ test('list users', async({page}) => {
   await page.getByRole('link', { name: 'Admin' }).click();
   await expect(page.getByRole('list')).toContainText('admin-dashboard');
 
-  await page.getByRole('button', { name: '»' }).first().click();
+  await page.getByRole('button', { name: '»' }).nth(0).click();
   await expect(page.getByRole('main')).toContainText(user.name);
   await expect(page.getByRole('main')).toContainText(validUsers['d@jwt.com'].name);
   await expect(page.getByRole('main')).toContainText(validUsers['f@jwt.com'].name);
