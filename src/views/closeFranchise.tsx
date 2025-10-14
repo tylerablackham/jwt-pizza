@@ -21,8 +21,10 @@ export default function CloseFranchise() {
           Are you sure you want to close the <span className='text-orange-500'>{state.franchise.name}</span> franchise? This will close all associated stores and cannot be restored. All outstanding
           revenue will not be refunded.
         </div>
-        <Button title='Close' onPress={close} />
-        <Button title='Cancel' onPress={navigateToParentPath} className='bg-transparent border-neutral-300' />
+        <div className="flex justify-center gap-4">
+          <Button title='Close' onPress={close} />
+          <Button title='Cancel' onPress={navigateToParentPath} className='bg-transparent border-neutral-300' />
+        </div>
       </div>
     </View>
   );

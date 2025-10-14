@@ -72,4 +72,10 @@ test('list users', async({page}) => {
   await page.getByRole('textbox', { name: 'Search Users' }).fill(user.name);
   await page.getByRole('cell', { name: `${user.name} Submit` }).getByRole('button').click();
   await expect(page.getByRole('main')).toContainText(user.name);
+
+  await page.getByRole('row', { name: `${user.name} ${user.email} ${user.roles.map(r => r.role).join(', ')} Delete User` }).getByRole('button').click();
+  await expect(page.getByRole('heading')).toContainText('Are you sure?');
+  await expect(page.getByRole('main')).toContainText(user.name);
+  await page.getByRole('button', { name: 'Delete User' }).click();
+  await expect(page.getByRole('list')).toContainText('admin-dashboard');
 })
