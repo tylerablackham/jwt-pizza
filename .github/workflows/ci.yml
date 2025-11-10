@@ -80,6 +80,16 @@ jobs:
           echo Deploying $version
           aws s3 cp dist s3://${{ secrets.APP_BUCKET }} --recursive
           aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
+
+      - name: Annotate deployment in Grafana
+        run: |
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":15, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":16, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":17, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":18, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":19, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+          curl -s -X POST https://tylerablackham.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"ty4sj2v", "panelId":20, "tags":["frontend","production"], "text":"Frontend Version '"$version"' deployed" }'
+
   release:
     needs:
       - build
