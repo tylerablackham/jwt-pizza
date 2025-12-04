@@ -14,6 +14,6 @@
 
 ### Tyler Blackham (attacking Thomas Utrilla)
 
-## Thomas Utrilla (attacking Tyler Blackham)
+### Thomas Utrilla (attacking Tyler Blackham)
 
 ## Combined Learning
