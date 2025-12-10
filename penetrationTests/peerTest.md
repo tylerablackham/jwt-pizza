@@ -38,8 +38,92 @@
 | Corrections    | Refactor Order router to check the database for the actual price                                                                                        |
 
 ### Thomas Utrilla
+## 1. Attempted Broken Access Control — Unauthorized User Update  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to modify another user’s account and assign admin roles. The server rejected the request with `401 Unauthorized`, preventing privilege escalation. |
+| Images         | ![screenshot_attempted_A01-2021_bao](screenshot_attempted_A01-2021_bao.png)                                                           |
+| Corrections    | No correction needed                                                                       |
+
+---
+
+## 2. Attempted Authentication Bypass / Unauthorized Access to User Data  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Identification & Authentication Failures (OWASP A07:2021)                                                                             |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to retrieve authenticated user data via `/api/user/me` without valid credentials. Server responded with `401 Unauthorized`, blocking the request. |
+| Images         | ![screenshot_attempted_A02](screenshot_attempted_A02.png)                                                                             |
+| Corrections    | No correction needed                                                                         |
+
+---
+
+## 3. Attempted Admin Dashboard Access  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to load `/admin/dashboard` directly without authentication. The server did not return protected admin content, preventing unauthorized admin panel access. |
+| Images         | ![screenshot_attempted_Broken_Access_Control](screenshot_attempted_Broken_Access_Control.png)                                         |
+| Corrections    | No correction needed                                                                         |
+
+---
+
+## 4. Attempted Credential Attack / Weak Password Attempt  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Cryptographic Failures (OWASP A02:2021) / Authentication Failures (A07:2021)                                                          |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to authenticate using invalid or weak credentials via `/api/auth`. The server rejected the login with `401 Unauthorized`, confirming proper password verification. |
+| Images         | ![screenshot_attempted_cryptographic_failure](screenshot_attempted_cryptographic_failure.png)                                         |
+| Corrections    | No correction needed                                                         |
+
+---
+
+## 5. Attempted Brute Force Attack via Intruder  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Identification & Authentication Failures (OWASP A07:2021)                                                                             |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Conducted a brute-force login attempt using common passwords (`x`, `y`, `a`, `password`, `12345`). All attempts failed except the baseline valid request. No unauthorized login occurred. |
+| Images         | ![screenshot_bruteforceattack](screenshot_bruteforceattack.png)                                                                       |
+| Corrections    | Consider implementing rate limiting or lockout policies to further mitigate brute-force attempts.                                      |
+
+---
+
+## 6. Successful Broken Access Control — Unauthorized Franchise Deletion  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 5th, 2025                                                                                                                    |
+| Target         | https://pizza.pizza-store.click/                                                                                                      |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 1 — Low                                                                                                                               |
+| Description    | Successfully executed a DELETE request on `/api/franchise/order?id=3` using only a user-level token. The server responded with `200 OK` and confirmed `"franchise deleted"`, showing insufficient authorization validation. |
+| Images         | ![screenshot_successful_A01_broken_access_control](screenshot_successful_A01_broken_access_control.png)                               |
+| Corrections    | Enforce server-side role-based validation on all DELETE endpoints. Validate user claims inside JWT before performing destructive actions. |
+
+---
 
 ## Peer Attack
+
 
 ### Tyler Blackham (attacking Thomas Utrilla)
 
@@ -85,6 +169,75 @@
 | Corrections    | Refactor edit user route to make sure the user email isn't already being used before doing anything.                                        |
 
 ### Thomas Utrilla (attacking Tyler Blackham)
+## 1. Unauthorized User Role Modification Attempt  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 9, 2025                                                                                                                      |
+| Target         | https://pizza.tab518.click/                                                                                                           |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to modify a user's roles by forging a request body containing `"role": "admin"`. The server rejected the request with a 401 Unauthorized response, confirming proper authorization controls. |
+| Images         | ![attack_add_user](attack_add_user.png)                                                                                               |
+| Corrections    | No correction needed, proper authorization checks prevented the exploit.                                                                |
+
+---
+
+## 2. Unauthorized Franchise Deletion Attempt  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 9, 2025                                                                                                                      |
+| Target         | https://pizza.tab518.click/                                                                                                           |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | A DELETE request to `/api/franchise/1` was made using an unauthorized token. The server returned a 500 Internal Server Error caused by `"Cannot read properties of undefined (reading 'isRole')"`, preventing the deletion but exposing an internal stack trace. |
+| Images         | ![attack_delete_franchise](attack_delete_franchise.png)                                                                              |
+| Corrections    | Sanitize error responses to avoid leaking stack traces; ensure role-check logic is null-safe.                                         |
+
+---
+
+## 3. Successful Unauthorized Access to Admin Franchise Data  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 9, 2025                                                                                                                      |
+| Target         | https://pizza.tab518.click/                                                                                                           |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 1 — Low                                                                                                                               |
+| Description    | Successfully accessed admin-only endpoint `/api/franchise?page=0&limit=3&name=*` and retrieved franchise data, including store names. Although no modification occurred, sensitive administrative data was exposed. |
+| Images         | ![attack_success_accessedadmindata](attack_success_accessedadmindata.png)                                                             |
+| Corrections    | Restrict franchise endpoints to admin roles; validate JWTs before resolving queries; implement server-side role-based routing.        |
+
+---
+
+## 4. Unauthorized Attempt to Update User Role  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 9, 2025                                                                                                                      |
+| Target         | https://pizza.tab518.click/                                                                                                           |
+| Classification | Broken Access Control (OWASP A01:2021)                                                                                                |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to elevate another user's role to `"admin"` by modifying `/api/user/{id}`. Server responded with 401 Unauthorized, indicating proper access control blocked privilege escalation. |
+| Images         | ![attack_update_user_role](attack_update_user_role.png)                                                                               |
+| Corrections    | No correction needed, authorization checks worked.                                                                                     |
+
+---
+
+## 5. Default Password Enumeration / Weak Credential Attempt  
+
+| Item           | Result                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | December 9, 2025                                                                                                                      |
+| Target         | https://pizza.tab518.click/                                                                                                           |
+| Classification | Identification & Authentication Failures (OWASP A07:2021)                                                                             |
+| Severity       | 0 — Unsuccessful                                                                                                                      |
+| Description    | Attempted to log in using a known default admin credential pattern (`a@jwt.com`). Login was rejected, showing the system does not accept default or commonly used credentials. |
+| Images         | ![attack_defaultpasswords](attack_defaultpasswords.png)                                                                               |
+| Corrections    | No correction needed, application properly rejects weak/default credentials. |
+
+---
 
 ## Combined Learning
 
@@ -104,3 +257,11 @@ when a purchase was being made, the back-end received the price of the pizza fro
 Because of this an attacker could modify the request and change the price and the back-end wouldn't care. The back-end 
 should have checked the price itself, especially since it stores the prices in its database. The back-end should always 
 be the source of truth because a malicious user cannot modify things like they can for the front-end.
+
+This project was very enlightening to see all the different ways that an bad actor can access your application. What particularly stood out in addition to the items above was the manipulating of JSON objects in addition to forging JWT tokens.
+
+On your backend, you need to ensure to be sanitizing and checking that each request that comes in has the correct shape, attributes, and that it matches what it is suppose to be. Bad actors can grab and transform JSON objects to their liking, and with particularly PUT requests they can change data to give themselves more permissions, which can lead to other attacks in various parts of the application.
+
+Tokens are also a big focus on attacks. Looking online, there are multiple ways that you can change tokens and the data that they store in hopes of tricking the application that is being attacked. Having up-to-date protocols on token handling can prevent a myriad of methods used to use tokens to gain access.
+
+Overall, this was an amazing project that helped us gain better insights into how to better defend our projects while simultaneously giving us awareness to the types of attacks that are prevalent in this age of cybersecurity.
